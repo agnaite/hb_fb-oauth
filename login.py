@@ -1,5 +1,5 @@
 import os
-
+import json
 client_id = os.environ['FB_ID']
 client_secret = os.environ['FB_SECRET']
 redirect_uri = 'http://localhost:5000/process_login'
@@ -14,15 +14,16 @@ facebook = facebook_compliance_fix(facebook)
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-from flask import Flask, render_template, request, jsonify, session, abort, redirect
+from flask import Flask, render_template, request, jsonify, session, abort, redirect, url_for
 from flask_assets import Environment
-from jinja2 import StrictUndefined
+from jinja2 import StrictUndefined, Undefined
 
 app = Flask(__name__)
 
 assets = Environment(app)
 
 app.jinja_env.undefined = StrictUndefined
+JINJA2_ENVIRONMENT_OPTIONS = { 'undefined' : Undefined }
 assets.url = app.static_url_path
 app.config['ASSETS_DEBUG'] = True
 
@@ -34,11 +35,12 @@ def is_valid_state(state):
 
 # Basic Routes *********************************
 
-@app.route('/')
-def index_page():
+@app.route('/test/<user>')
+def index_page(user):
     """Show index page."""
 
-    return render_template("base.html")
+    return render_template("base.html",
+                            user=user)
 
 @app.route('/login')
 def login_page():
@@ -61,17 +63,14 @@ def process_login():
         # Uh-oh, this request wasn't started by us!
         abort(403)
     code = request.args.get('code')
-    print 20 * '*'
-    print code
-    # We'll change this next line in just a moment
 
     facebook.fetch_token(token_url, client_secret=client_secret,
                          authorization_response="http://localhost:5000/process_login?code="+code+"&state="+state)
-
+    # print access_token
     r = facebook.get('https://graph.facebook.com/me?')
-
-    return render_template('base.html',
-                           content=r.content)
+    user = r.content
+    # user = json.loads(r.content)
+    return redirect(url_for('test', user='blah'))
 
 
 if __name__ == "__main__":

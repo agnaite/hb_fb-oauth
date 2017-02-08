@@ -4,6 +4,8 @@
 </head>
 <body>
     <h1>"hello"</h1>
-    <h2>{{content}}</h2>
+    {% if user is defined %}
+        <h2>{{user}}</h2>
+    {% endif %}
 </body>
 </html>
