@@ -66,12 +66,12 @@ def process_login():
     # We'll change this next line in just a moment
 
     facebook.fetch_token(token_url, client_secret=client_secret,
-                         authorization_response=code)
+                         authorization_response="http://localhost:5000/process_login?code="+code+"&state="+state)
 
     r = facebook.get('https://graph.facebook.com/me?')
-    return r.content
+    return r.content.name
 
 
 if __name__ == "__main__":
-    pass
-    # app.run(host="0.0.0.0", port=5000, debug=True)
+    
+    app.run(host="0.0.0.0", port=5000, debug=True)
