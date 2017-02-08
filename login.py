@@ -14,7 +14,7 @@ facebook = facebook_compliance_fix(facebook)
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-from flask import Flask, render_template, request, jsonify, session, abort
+from flask import Flask, render_template, request, jsonify, session, abort, redirect
 from flask_assets import Environment
 from jinja2 import StrictUndefined
 
@@ -47,7 +47,7 @@ def login_page():
     authorization_url, state = facebook.authorization_url(authorization_base_url)
     print 'Please go here and authorize,', authorization_url
 
-    return authorization_url
+    return redirect(authorization_url, code=302)
 
 
 @app.route('/process_login')
@@ -69,7 +69,9 @@ def process_login():
                          authorization_response="http://localhost:5000/process_login?code="+code+"&state="+state)
 
     r = facebook.get('https://graph.facebook.com/me?')
-    return r.content.name
+
+    return render_template('base.html',
+                           content=r.content)
 
 
 if __name__ == "__main__":
