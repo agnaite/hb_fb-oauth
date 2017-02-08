@@ -16,14 +16,13 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 from flask import Flask, render_template, request, jsonify, session, abort, redirect, url_for
 from flask_assets import Environment
-from jinja2 import StrictUndefined, Undefined
+from jinja2 import Undefined
 
 app = Flask(__name__)
 
 assets = Environment(app)
 
-app.jinja_env.undefined = StrictUndefined
-JINJA2_ENVIRONMENT_OPTIONS = { 'undefined' : Undefined }
+JINJA2_ENVIRONMENT_OPTIONS = {'undefined': Undefined}
 assets.url = app.static_url_path
 app.config['ASSETS_DEBUG'] = True
 
